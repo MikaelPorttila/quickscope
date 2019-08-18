@@ -4,7 +4,7 @@
 	TODO (Mikael) - Logging.
 */
 
-use super::lib::constants::APP_NAME;
+use super::constants::APP_NAME;
 use std::process::Command;
 
 pub fn handle_service_command(command: &str) {

@@ -1,6 +1,10 @@
-use actix_web::{HttpRequest, Responder};
+use actix_web::{web, HttpRequest, Responder, Scope};
 
-pub const DEFAULT_ACTION_ROUTE: &'static str = "/";
-pub fn default_action(_req: HttpRequest) -> impl Responder {
+pub fn route() -> Scope {
+	return web::scope("/")
+		.route("", web::get().to(index));
+}
+
+pub fn index(_req: HttpRequest) -> impl Responder {
 	return format!("");
 }

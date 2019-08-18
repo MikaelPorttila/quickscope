@@ -1,11 +1,11 @@
-use std::env;
 mod api;
 mod lib;
-mod service_manager;
 
 use api::start_web_server;
 use lib::constants::APP_DISPLAY_NAME;
-use service_manager::handle_service_command;
+use lib::service_manager::handle_service_command;
+use lib::db::handle_db_command;
+use std::env;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -19,18 +19,21 @@ fn display_about() {
 }
 
 fn handle_command(cmd: Command) {
+    /*
+        Note(MIKAEL) - Once this gets too messy install the clap lib,
+        right now we don't need the overhead.
+    */
     match cmd.name.as_str() {
         "start" => start_web_server(), /* Should only be used for debugging */
         "service" => handle_service_command(cmd.parameter.as_str()),
+        "db" => handle_db_command(cmd.parameter.as_str()),
         "about" => display_about(),
         "sandbox" => sandbox_fn(),
         _ => println!("Unknown command"),
     };
 }
 
-fn sandbox_fn() {
-    /* */
-}
+fn sandbox_fn() {}
 
 struct Command {
     name: String,
