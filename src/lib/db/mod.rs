@@ -1,7 +1,7 @@
 mod connection;
+mod functions;
 mod migration;
 mod schema;
-mod functions;
 
 pub use super::constants;
 

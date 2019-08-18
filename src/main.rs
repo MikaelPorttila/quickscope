@@ -3,8 +3,8 @@ mod lib;
 
 use api::start_web_server;
 use lib::constants::APP_DISPLAY_NAME;
-use lib::service_manager::handle_service_command;
 use lib::db::handle_db_command;
+use lib::service_manager::handle_service_command;
 use std::env;
 
 fn main() {

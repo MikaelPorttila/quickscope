@@ -8,9 +8,7 @@ use actix_web::{web, App, HttpServer};
 
 pub fn start_web_server() {
 	println!("Running web server");
-	HttpServer::new(|| {
-		App::new().configure(config)
-	})
+	HttpServer::new(|| App::new().configure(config))
 		.bind("127.0.0.1:8000")
 		.expect("Can't bind to port 8000")
 		.run()

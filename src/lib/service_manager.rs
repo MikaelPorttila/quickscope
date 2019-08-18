@@ -1,4 +1,4 @@
-/* 
+/*
 	TODO (Mikael) - Add cross-platform support and stop abusing sc.exe.
 	TODO (Mikael) - Require ADMIN privileges before running commands.
 	TODO (Mikael) - Logging.

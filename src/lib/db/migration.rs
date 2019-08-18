@@ -2,9 +2,9 @@
 	TODO (MIKAEL) - Add or build db migration lib.
 */
 use super::connection::open_connection;
+use super::functions::*;
 use super::schema::*;
 use rusqlite::{params, Connection, NO_PARAMS};
-use super::functions::*;
 
 pub fn setup() {
 	println!("Database migration started...");

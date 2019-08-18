@@ -1,4 +1,4 @@
-use actix_web::{HttpRequest, Responder, web, Scope};
+use actix_web::{web, HttpRequest, Responder, Scope};
 
 pub fn route() -> Scope {
 	return web::scope("/hello")
@@ -11,6 +11,6 @@ fn index(_req: HttpRequest) -> impl Responder {
 }
 
 fn hello_world_action(req: HttpRequest) -> impl Responder {
-	let name = req.match_info().get("name").unwrap_or_else(||"");
+	let name = req.match_info().get("name").unwrap_or_else(|| "");
 	return format!("Hello {}", name);
 }
