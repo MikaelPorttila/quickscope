@@ -1,72 +1,49 @@
 /*
 	TODO (MIKAEL) - Add or build db migration lib.
 */
-use super::connection::open_connection;
-use super::functions::*;
+use super::entities::AppConfig;
 use super::schema::*;
-use rusqlite::{params, Connection, NO_PARAMS};
+use rusqlite::NO_PARAMS;
 
-pub fn setup() {
+pub fn setup(app_config: &AppConfig) {
+	let db_context = DBContext::new(app_config);
+
 	println!("Database migration started...");
 
-	let conn = open_connection();
+	let settings_table_exists = db_context.check_if_table_exists("Settings").unwrap();
 
-	let mut version = conn
-		.query_row::<u32, _, _>(
-			"SELECT count(name) 
-			FROM sqlite_master 
-			WHERE type='table' AND name='Settings'",
-			NO_PARAMS,
-			|row| row.get(0),
-		)
-		.unwrap();
-
-	/*
-		VERSION 1:
-	*/
-	if version == 0 {
-		conn.execute(
-			"CREATE TABLE Settings(
-			id INTEGER PRIMARY KEY,
+	if !settings_table_exists {
+		db_context
+			.connection
+			.execute(
+				"CREATE TABLE Settings(
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			name TEXT NOT NULL,
-			value TEXT NOT NULL
-		)",
-			NO_PARAMS,
-		)
-		.unwrap();
+			value TEXT NOT NULL)",
+				NO_PARAMS,
+			)
+			.unwrap();
 
-		version = 1;
-		conn.execute(
-			"INSERT INTO Settings(id, name, value) values(?1, ?2, ?3)",
-			params![0, DB_VERSION_SETTING_NAME, version],
-		)
-		.unwrap();
-		log_database_version_update(version);
-	} else {
-		let version_row = get_row_from_settings_by_name(&conn, DB_VERSION_SETTING_NAME).unwrap();
-		version = version_row.value.parse().unwrap();
+		let setting_row =
+			DBSetting::from_values(DB_VERSION_SETTING_NAME.to_string(), 1.to_string());
+		db_context.insert_db_setting(&setting_row).unwrap();
+		print_database_version_update(1);
 	}
 
-	/*
-		VERSION 2: Testing stuff...
-	*/
+	let mut version_row = db_context
+		.get_db_setting_by_name(DB_VERSION_SETTING_NAME)
+		.unwrap();
+	let mut version = version_row.value.parse().unwrap();
+
 	if version < 2 {
 		version = 2;
-		update_database_version(version, &conn);
+		version_row.value = 2.to_string();
+		db_context.update_db_setting(&version_row).unwrap();
+		print_database_version_update(version);
 	}
-
 	println!("Database setup completed");
 }
 
-fn update_database_version(version: u32, conn: &Connection) {
-	conn.execute(
-		"UPDATE Settings set value=?1 where name = ?2",
-		params![version, DB_VERSION_SETTING_NAME],
-	)
-	.unwrap();
-	log_database_version_update(version);
-}
-
-fn log_database_version_update(version: u32) {
+fn print_database_version_update(version: i32) {
 	println!("v.{} installed", version);
 }
